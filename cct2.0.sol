@@ -35,6 +35,7 @@ contract token is SafeMath{
     uint8 public decimals;
     uint256 public totalSupply;
     address payable public owner;
+    address public miner;
 
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
@@ -66,6 +67,7 @@ contract token is SafeMath{
         symbol = tokenSymbol;                               // Set the symbol for display purposes
         decimals = decimalUnits;                            // Amount of decimals for display purposes
         owner = msg.sender;
+        miner = msg.sender;
     }
 
     /* Send coins */
@@ -165,9 +167,14 @@ contract token is SafeMath{
 	
 	// transfer balance to owner
 	function withdrawQKI(uint256 amount) public{
-		if(msg.sender != owner)revert();
+		require(msg.sender == owner);
 		owner.transfer(amount);
 	}
+
+    function setOwner(address newOwner) public{
+        require(msg.sender != owner);
+        owner = newOwner;
+    }
 
     function setMiner(address newMiner) public{
         require(msg.sender != owner);
