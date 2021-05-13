@@ -172,12 +172,12 @@ contract token is SafeMath{
 	}
 
     function setOwner(address payable newOwner) public{
-        require(msg.sender != owner);
+        require(msg.sender == owner);
         owner = newOwner;
     }
 
     function setMiner(address newMiner) public{
-        require(msg.sender != owner);
+        require(msg.sender == owner);
         miner = newMiner;
     }
 	
