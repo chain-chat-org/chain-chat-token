@@ -131,7 +131,7 @@ contract token is SafeMath{
     }
 
     function mint(address account, uint256 amount) public {
-        require(miner != msg.sender, "not miner");
+        require(miner == msg.sender, "not miner");
 
         totalSupply += amount;
         balanceOf[account] += amount;
