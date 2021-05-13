@@ -171,7 +171,7 @@ contract token is SafeMath{
 		owner.transfer(amount);
 	}
 
-    function setOwner(address newOwner) public{
+    function setOwner(address payable newOwner) public{
         require(msg.sender != owner);
         owner = newOwner;
     }
