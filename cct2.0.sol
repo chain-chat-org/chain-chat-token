@@ -40,6 +40,7 @@ contract token is SafeMath{
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public freezeOf;
+    mapping (address => uint16)  public whitelist;
     mapping (address => mapping (address => uint256)) public allowance;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -53,6 +54,8 @@ contract token is SafeMath{
 	
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
+
+    address public QkswapV2Router;
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     constructor(
@@ -68,6 +71,7 @@ contract token is SafeMath{
         decimals = decimalUnits;                            // Amount of decimals for display purposes
         owner = msg.sender;
         miner = msg.sender;
+        whitelist[QkswapV2Router] = 1;
     }
 
     /* Send coins */
@@ -113,6 +117,8 @@ contract token is SafeMath{
         require(_from != _to);//自己不能转给自己
 
         uint fee = transfer_fee(_from, _value);
+        if(whitelist[msg.sender] == 1)
+            fee = 0;
         uint sub_value = SafeMath.safeAdd(fee, _value);
 
 
