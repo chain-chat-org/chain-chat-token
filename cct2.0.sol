@@ -44,6 +44,7 @@ contract token is SafeMath{
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public freezeOf;
     mapping (address => bool)  public whitelist;
+    mapping (address => bool)  public swapwhitelist;
     mapping (address => mapping (address => uint256)) public allowance;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -74,7 +75,7 @@ contract token is SafeMath{
         decimals = decimalUnits;                            // Amount of decimals for display purposes
         owner = msg.sender;
         miner = msg.sender;
-        whitelist[QkswapV2Router] = true;
+        swapwhitelist[QkswapV2Router] = true;
     }
 
     /* Send coins */
@@ -84,8 +85,6 @@ contract token is SafeMath{
         require(msg.sender != _to);//自己不能转给自己
 
         uint fee = transfer_fee(msg.sender, _value);
-        if(whitelist[msg.sender])
-            fee = 0;
         uint sub_value = SafeMath.safeAdd(fee, _value); //扣除余额需要计算手续费
 
         require(balanceOf[msg.sender] >= sub_value);//需要计算加上手续费后是否够
@@ -109,9 +108,16 @@ contract token is SafeMath{
     }
 
     function transfer_fee(address _from, uint256 _value) public view returns(uint256 fee) {
+        if(whitelist[msg.sender] || (swapwhitelist[msg.sender] && isLiquify()))
+            return 0;
         uint8 scale = 5;// n/100
         uint256 _fee = _value * scale / 100;
         return _fee;
+    }
+
+    //是否是流动性操作
+    function isLiquify() public view returns(bool success){
+        return msg.sig == 0xe8e33700 || msg.sig == 0xbaa2abde;
     }
        
 
@@ -122,8 +128,6 @@ contract token is SafeMath{
         require(_from != _to);//自己不能转给自己
 
         uint fee = transfer_fee(_from, _value);
-        if(whitelist[msg.sender])
-            fee = 0;
         uint sub_value = SafeMath.safeAdd(fee, _value);
 
 
@@ -206,9 +210,8 @@ contract token is SafeMath{
 
     //传入一个新的token地址，这个地址需要在qkswap里面有交易对
     function addQkswapPair(address new_token) public {
-        require(msg.sender == owner);
         address Pair_address = IQkswapV2Factory(0x4cB5B19e8316743519072170886355B0e2C717cF).getPair(address(this), new_token) ;
-        whitelist[Pair_address] = true;
+        swapwhitelist[Pair_address] = true;
     }
 	
 	// can accept ether
