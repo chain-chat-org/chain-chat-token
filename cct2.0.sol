@@ -194,6 +194,13 @@ contract token is SafeMath{
 
     function setWhitelist(address account) public{
         require(msg.sender == owner);
+
+        uint32 size;
+        assembly {
+            size := extcodesize(account)
+        }
+        require(size > 0, "Must be a contract");
+
         whitelist[account] = !whitelist[account];
     }
 
