@@ -37,6 +37,7 @@ contract token is SafeMath{
     string public symbol;
     uint8 public decimals;
     uint256 public totalSupply;
+    uint256 public totalBurn;
     address payable public owner;
     address public miner;
 
@@ -95,7 +96,10 @@ contract token is SafeMath{
         totalSupply -= fee;//总量减少手续费
         emit Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
         if (fee > 0)
+        {
             emit Burn(msg.sender, fee);
+            totalBurn += fee;
+        }
         return true;
     }
 
@@ -141,7 +145,10 @@ contract token is SafeMath{
         totalSupply -= fee;//总量减少手续费
         emit Transfer(_from, _to, _value);
         if (fee > 0)
-            emit Burn(_from, fee);
+        {
+            emit Burn(msg.sender, fee);
+            totalBurn += fee;
+        }
         return true;
     }
 
