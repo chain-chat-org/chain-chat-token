@@ -45,7 +45,6 @@ contract token is SafeMath{
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public freezeOf;
     mapping (address => bool)  public whitelist;
-    mapping (address => bool)  public swapwhitelist;
     mapping (address => mapping (address => uint256)) public allowance;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -76,7 +75,6 @@ contract token is SafeMath{
         decimals = decimalUnits;                            // Amount of decimals for display purposes
         owner = msg.sender;
         miner = msg.sender;
-        swapwhitelist[QkswapV2Router] = true;
     }
 
     /* Send coins */
@@ -112,18 +110,12 @@ contract token is SafeMath{
     }
 
     function transfer_fee(address _from, uint256 _value) public view returns(uint256 fee) {
-        if(whitelist[msg.sender] || (swapwhitelist[msg.sender] && isLiquify()))
+        if(whitelist[msg.sender])
             return 0;
         uint8 scale = 5;// n/100
         uint256 _fee = _value * scale / 100;
         return _fee;
     }
-
-    //是否是流动性操作
-    function isLiquify() public view returns(bool success){
-        return msg.sig == 0xe8e33700 || msg.sig == 0xbaa2abde;
-    }
-       
 
     /* A contract attempts to get the coins */
     function transferFrom(address _from, address _to, uint256 _value) public returns(bool success)  {
@@ -213,12 +205,6 @@ contract token is SafeMath{
         require(size > 0, "Must be a contract");
 
         whitelist[account] = !whitelist[account];
-    }
-
-    //传入一个新的token地址，这个地址需要在qkswap里面有交易对
-    function addQkswapPair(address new_token) public {
-        address Pair_address = IQkswapV2Factory(0x4cB5B19e8316743519072170886355B0e2C717cF).getPair(address(this), new_token) ;
-        swapwhitelist[Pair_address] = true;
     }
 	
 	// can accept ether
