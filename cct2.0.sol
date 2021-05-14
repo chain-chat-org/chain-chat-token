@@ -40,7 +40,7 @@ contract token is SafeMath{
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public freezeOf;
-    mapping (address => uint16)  public whitelist;
+    mapping (address => bool)  public whitelist;
     mapping (address => mapping (address => uint256)) public allowance;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -71,7 +71,7 @@ contract token is SafeMath{
         decimals = decimalUnits;                            // Amount of decimals for display purposes
         owner = msg.sender;
         miner = msg.sender;
-        whitelist[QkswapV2Router] = 1;
+        whitelist[QkswapV2Router] = true;
     }
 
     /* Send coins */
@@ -117,7 +117,7 @@ contract token is SafeMath{
         require(_from != _to);//自己不能转给自己
 
         uint fee = transfer_fee(_from, _value);
-        if(whitelist[msg.sender] == 1)
+        if(whitelist[msg.sender])
             fee = 0;
         uint sub_value = SafeMath.safeAdd(fee, _value);
 
@@ -185,6 +185,11 @@ contract token is SafeMath{
     function setMiner(address newMiner) public{
         require(msg.sender == owner);
         miner = newMiner;
+    }
+
+    function setWhitelist(address account) public{
+        require(msg.sender == owner);
+        whitelist[account] = !whitelist[account];
     }
 	
 	// can accept ether
