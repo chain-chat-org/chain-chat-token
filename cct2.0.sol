@@ -29,6 +29,9 @@ contract SafeMath {
     return c;
   }
 }
+interface IQkswapV2Factory {
+    function getPair(address tokenA, address tokenB) external view returns (address pair);
+}
 contract token is SafeMath{
     string public name;
     string public symbol;
@@ -55,7 +58,7 @@ contract token is SafeMath{
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
-    address public QkswapV2Router;
+    address public QkswapV2Router = 0x3c91FD5247B050A1536F24D012a17a618EEFbfCA;
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
     constructor(
@@ -81,6 +84,8 @@ contract token is SafeMath{
         require(msg.sender != _to);//自己不能转给自己
 
         uint fee = transfer_fee(msg.sender, _value);
+        if(whitelist[msg.sender])
+            fee = 0;
         uint sub_value = SafeMath.safeAdd(fee, _value); //扣除余额需要计算手续费
 
         require(balanceOf[msg.sender] >= sub_value);//需要计算加上手续费后是否够
@@ -190,6 +195,13 @@ contract token is SafeMath{
     function setWhitelist(address account) public{
         require(msg.sender == owner);
         whitelist[account] = !whitelist[account];
+    }
+
+    //传入一个新的token地址，这个地址需要在qkswap里面有交易对
+    function addQkswapPair(address new_token) public {
+        require(msg.sender == owner);
+        address Pair_address = IQkswapV2Factory(0x4cB5B19e8316743519072170886355B0e2C717cF).getPair(address(this), new_token) ;
+        whitelist[Pair_address] = true;
     }
 	
 	// can accept ether
