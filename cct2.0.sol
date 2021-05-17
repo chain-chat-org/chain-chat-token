@@ -59,8 +59,6 @@ contract token is SafeMath{
 	/* This notifies clients about the amount unfrozen */
     event Unfreeze(address indexed from, uint256 value);
 
-    address public QkswapV2Router = 0x3c91FD5247B050A1536F24D012a17a618EEFbfCA;
-
     /* Initializes contract with initial supply tokens to the creator of the contract */
     constructor(
         uint256 initialSupply,
