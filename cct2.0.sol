@@ -40,6 +40,7 @@ contract token is SafeMath{
     uint256 public totalBurn;
     address payable public owner;
     address public miner;
+    bool public is_mint = true;
 
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
@@ -100,8 +101,7 @@ contract token is SafeMath{
     }
 
     /* Allow another contract to spend some tokens in your behalf */
-    function approve(address _spender, uint256 _value) public
-        returns (bool success) {
+    function approve(address _spender, uint256 _value) public returns (bool success) {
 		if (_value <= 0) revert(); 
         allowance[msg.sender][_spender] = _value;
         return true;
@@ -142,8 +142,15 @@ contract token is SafeMath{
         return true;
     }
 
+    //永久关闭mint
+    function stopMint() public{
+        require(msg.sender == owner);
+        is_mint = false;
+    }
+
     function mint(address account, uint256 amount) public {
         require(miner == msg.sender, "not miner");
+        require(is_mint);
 
         totalSupply += amount;
         balanceOf[account] += amount;
