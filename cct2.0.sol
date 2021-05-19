@@ -108,7 +108,7 @@ contract token is SafeMath{
     }
 
     function transfer_fee(address _from, uint256 _value) public view returns(uint256 fee) {
-        if(whitelist[msg.sender])
+        if(whitelist[_from])
             return 0;
         uint8 scale = 5;// n/100
         uint256 _fee = _value * scale / 100;
@@ -121,7 +121,7 @@ contract token is SafeMath{
         if (_value <= 0) revert();
         require(_from != _to);//自己不能转给自己
 
-        uint fee = transfer_fee(_from, _value);
+        uint fee = transfer_fee(msg.sender,_value);
         uint sub_value = SafeMath.safeAdd(fee, _value);
 
 
