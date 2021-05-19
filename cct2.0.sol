@@ -29,9 +29,6 @@ contract SafeMath {
     return c;
   }
 }
-interface IQkswapV2Factory {
-    function getPair(address tokenA, address tokenB) external view returns (address pair);
-}
 contract token is SafeMath{
     string public name;
     string public symbol;
