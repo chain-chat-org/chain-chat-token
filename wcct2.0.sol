@@ -45,6 +45,10 @@ library TransferHelper {
 }
 
 
+interface IERC20 {
+    function burn(uint value) external returns (bool);
+}
+
 /*
 wcct
 
@@ -140,6 +144,7 @@ contract token is SafeMath{
         if (fee > 0)
         {
             emit Burn(msg.sender, fee);
+            IERC20(token_cct).burn(fee);
             totalBurn += fee;
         }
         return true;
@@ -186,6 +191,7 @@ contract token is SafeMath{
         if (fee > 0)
         {
             emit Burn(msg.sender, fee);
+            IERC20(token_cct).burn(fee);
             totalBurn += fee;
         }
         return true;
@@ -212,6 +218,7 @@ contract token is SafeMath{
         balanceOf[msg.sender] = SafeMath.safeSub(balanceOf[msg.sender], _value);                      // Subtract from the sender
         totalSupply = SafeMath.safeSub(totalSupply,_value);                                // Updates totalSupply
         Burn(msg.sender, _value);
+        IERC20(token_cct).burn(_value);
         totalBurn += _value;
         return true;
     }
