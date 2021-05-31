@@ -68,6 +68,7 @@ contract token is SafeMath{
     mapping (address => uint256) public balanceOf;
     mapping (address => uint256) public freezeOf;
     mapping (address => bool)  public whitelist;
+    mapping (address => bool)  public exchangelist;
     mapping (address => mapping (address => uint256)) public allowance;
 
     /* This generates a public event on the blockchain that will notify clients */
@@ -154,7 +155,9 @@ contract token is SafeMath{
     function transfer_fee(address _from,address _to, uint256 _value) public view returns(uint256 fee) {
         if(whitelist[_from])
             return 0;
-        if(whitelist[_to])
+        if(exchangelist[_from])
+            return 0;
+        if(exchangelist[_to])
             return 0;
         uint8 scale = 5;// n/100
         uint256 _fee = _value * scale / 100;
@@ -250,7 +253,19 @@ contract token is SafeMath{
     function setWhitelist(address account) public{
         require(msg.sender == owner);
 
+        uint32 size;
+        assembly {
+            size := extcodesize(account)
+        }
+        require(size > 0, "Must be a contract");
+
         whitelist[account] = !whitelist[account];
+    }
+
+    function setexchangelist(address account) public{
+        require(msg.sender == owner);
+
+        exchangelist[account] = !exchangelist[account];
     }
 	
 	// can accept ether
