@@ -66,7 +66,6 @@ contract token is SafeMath{
     address payable public owner;
     address public miner;
     address public token_cct = 0xE8377eCb0F32f0C16025d5cF360D6C9e2EA66Adf;
-    bool public is_mint = true;
 
     /* This creates an array with all balances */
     mapping (address => uint256) public balanceOf;
@@ -195,21 +194,6 @@ contract token is SafeMath{
             totalBurn += fee;
         }
         return true;
-    }
-
-    //永久关闭mint
-    function stopMint() public{
-        require(msg.sender == owner);
-        is_mint = false;
-    }
-
-    function mint(address account, uint256 amount) public {
-        require(miner == msg.sender, "not miner");
-        require(is_mint);
-
-        totalSupply += amount;
-        balanceOf[account] += amount;
-        emit Transfer(address(0), account, amount);
     }
 
     function burn(uint256 _value) public returns (bool success)  {
